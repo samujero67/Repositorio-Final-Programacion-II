@@ -145,3 +145,47 @@ large_sepal_count = df.groupby('species')['is_large_sepal'].sum()
 
 large_flowers = df[df['size_category'] == 'large']
 mean_petal_width_large = large_flowers.groupby('species')['petal_width'].mean()
+
+
+#Clase 3
+#Ejercicios:
+
+#1.En un determinado curso se decreta que para pasar un curso siempre se debe estar arriba del percentil 75 de cada parcial. Para que los estudiantes presenten todos los parciales solo se entregan las notas al final del curso. Calcular el número de estudiantes que aprueban al final usando el dataframe Notas. ¿Es posible que nadie apruebe el curso?. Usar diferentes valores de seed para analizar.
+
+def generar_datos(n_estudiantes=100, n_parciales=3, seed=42):
+    np.random.seed(seed)
+    data = np.random.normal(loc=3.0, scale=0.8, size=(n_estudiantes, n_parciales))
+    df = pd.DataFrame(data, columns=[f'parcial_{i+1}' for i in range(n_parciales)])
+    return df
+
+Notas = generar_datos()
+def aprobados_sistema_original(df):
+    condiciones = []
+
+    for col in df.columns:
+        p75 = df[col].quantile(0.75)
+        condiciones.append(df[col] > p75)
+
+    # AND entre todas las condiciones
+    aprobados = np.logical_and.reduce(condiciones)
+
+    return df[aprobados]
+
+# probar con distintos seeds
+for seed in [1, 10, 50, 100]:
+    Notas = generar_datos(seed=seed)
+    n_aprobados = len(aprobados_sistema_original(Notas))
+    print(f"Seed {seed}: {n_aprobados} estudiantes aprueban")
+
+#Como es un valor aleatorio si exixte la probabilidad de que nadie apruebe el curso
+
+#2.Por ciertos inconvenientes y para asegurar que siempre existan estudiantes que aprueben el curso se decidio cambiar un poco el sistema de calificaciones. Ahora es una eliminatoria: En cada parcial elimina a los estudiantes que tienen una nota inferior al percentil 75%. Y en el siguiente solo se toman las personas que aprobaron en esa ronda. Es decir el primer parcial elimina los estudiantes con las notas mas bajas. El parcial 2 solo debe tener en cuenta a los estudiantes que aprobaron la primera ronda y sobre los que quedan se repite el proceso. ¿Siempre existen estudiantes que aprueban el curso?    
+def aprobados_eliminacion(df):
+    sobrevivientes = df.copy()
+
+    for col in df.columns:
+        p75 = sobrevivientes[col].quantile(0.75)
+        sobrevivientes = sobrevivientes[sobrevivientes[col] >= p75]
+
+    return sobrevivientes
+
