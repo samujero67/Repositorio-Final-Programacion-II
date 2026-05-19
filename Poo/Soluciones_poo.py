@@ -246,3 +246,139 @@ class EstudianteTrabajador(Persona, Trabajador):
         return (f"{Persona.informacion(self)} | "
                 f"{Trabajador.informacion(self)} | "
                 f"Universidad: {self.universidad}")
+    
+#Ejercicios: Uso básico de métodos de instancia
+#1.
+class Persona:
+    def __init__(self, nombre, edad):
+        self.nombre = nombre
+        self.edad = edad
+
+    def saludar(self):
+        print(f"Hola, soy {self.nombre}")
+
+    def es_mayor_de_edad(self):
+        return self.edad >= 18
+
+#2.
+class Cuenta:
+    def __init__(self, titular, saldo=0):
+        self.titular = titular
+        self.saldo = saldo
+
+    def depositar(self, cantidad):
+        if cantidad > 0:
+            self.saldo += cantidad
+
+    def retirar(self, cantidad):
+        if cantidad > 0 and cantidad <= self.saldo:
+            self.saldo -= cantidad
+        else:
+            print("Fondos insuficientes o cantidad inválida")
+
+    def consultar_saldo(self):
+        return self.saldo
+
+#3.class Rectangulo:
+    def __init__(self, base, altura):
+        self.base = base
+        self.altura = altura
+
+    def area(self):
+        return self.base * self.altura
+
+    def perimetro(self):
+        return 2 * (self.base + self.altura)
+
+    def es_cuadrado(self):
+        return self.base == self.altura
+
+#4.
+class Polinomio:
+    def __init__(self, coeficientes):
+        self.coeficientes = coeficientes
+
+    def __str__(self):
+        terminos = []
+        for i, coef in enumerate(self.coeficientes):
+            if coef == 0:
+                continue
+            if i == 0:
+                terminos.append(f"{coef}")
+            elif i == 1:
+                terminos.append(f"{coef}x")
+            else:
+                terminos.append(f"{coef}x^{i}")
+        return " + ".join(terminos) if terminos else "0"
+
+    def __add__(self, other):
+        max_len = max(len(self.coeficientes), len(other.coeficientes))
+        resultado = []
+
+        for i in range(max_len):
+            a = self.coeficientes[i] if i < len(self.coeficientes) else 0
+            b = other.coeficientes[i] if i < len(other.coeficientes) else 0
+            resultado.append(a + b)
+
+        return Polinomio(resultado)
+
+    def __sub__(self, other):
+        max_len = max(len(self.coeficientes), len(other.coeficientes))
+        resultado = []
+
+        for i in range(max_len):
+            a = self.coeficientes[i] if i < len(self.coeficientes) else 0
+            b = other.coeficientes[i] if i < len(other.coeficientes) else 0
+            resultado.append(a - b)
+
+        return Polinomio(resultado)
+
+    def __mul__(self, other):
+        resultado = [0] * (len(self.coeficientes) + len(other.coeficientes) - 1)
+
+        for i in range(len(self.coeficientes)):
+            for j in range(len(other.coeficientes)):
+                resultado[i + j] += self.coeficientes[i] * other.coeficientes[j]
+
+        return Polinomio(resultado)
+
+    def evaluar(self, x):
+        resultado = 0
+        for i, coef in enumerate(self.coeficientes):
+            resultado += coef * (x ** i)
+        return resultado
+
+#5.
+class Cajero:
+    def __init__(self, n1, n2, n3):
+        self.b10 = n1
+        self.b20 = n2
+        self.b50 = n3
+
+    def retirar(self, cantidad):
+        restante = cantidad
+
+        # Copias temporales para intentar la operación
+        usar50 = min(restante // 50000, self.b50)
+        restante -= usar50 * 50000
+
+        usar20 = min(restante // 20000, self.b20)
+        restante -= usar20 * 20000
+
+        usar10 = min(restante // 10000, self.b10)
+        restante -= usar10 * 10000
+
+        # Verificar si se pudo completar el monto exacto
+        if restante != 0:
+            return "No es posible entregar la cantidad solicitada"
+
+        # Actualizar el estado del cajero
+        self.b50 -= usar50
+        self.b20 -= usar20
+        self.b10 -= usar10
+
+        return {
+            "50000": usar50,
+            "20000": usar20,
+            "10000": usar10
+        }
